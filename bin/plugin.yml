@@ -1,0 +1,20 @@
+name: EnteisNewPlugin
+prefix: "Entei's New Plugin"
+version: "0.01"
+description: >
+  A basic blank plugin template created by Brian_Entei containing common features and api
+
+author: Brian_Entei
+website: Plugin site N/A; visit my server at redsandbox.no-ip.org:25565 for assistance or e-mail me at br45entei@gmail.com
+
+main: com.gmail.br45entei.main.Main
+softdepend: [Vault]
+
+commands:
+  newplugin:
+    description: "Configuration command for this plugin."
+    usage: "/newplugin {info|save|reload}"
+    aliases: [enteisnewplugin]
+  uuid:
+    description: "Checks player uuids and other useful functions."
+    aliases: [uuids]

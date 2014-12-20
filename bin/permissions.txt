@@ -1,0 +1,2 @@
+newplugin.*: enables all permissions for a player/group
+newplugin.cmd.use.<cmdname>: enables given command for a player/group

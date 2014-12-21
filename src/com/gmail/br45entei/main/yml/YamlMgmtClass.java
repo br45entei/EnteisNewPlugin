@@ -1,15 +1,55 @@
 package com.gmail.br45entei.main.yml;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.apache.commons.io.FilenameUtils;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import com.gmail.br45entei.main.FileMgmt;
 import com.gmail.br45entei.main.Main;
 
 /** @author Brian_Entei */
 public class YamlMgmtClass {
 	
+	/** Attempts to load a file based on the given file name and parent folder.<br>
+	 * If the file does not exist, this will try to create the file and create
+	 * it's data from the jar's assets folder.<br>
+	 * If the file does exist, this will return that file as is.
+	 * 
+	 * @param folder File
+	 * @param path String
+	 * @return The resulting file */
+	public static File getResourceFromStreamAsFile(File folder, String path) {
+		File output = new File(folder, FilenameUtils.getName(path));
+		try {
+			if(!output.exists()) {
+				output.createNewFile();
+			} else {
+				return output;
+			}
+			@SuppressWarnings("resource")
+			OutputStream out = new FileOutputStream(output);
+			FileMgmt.copy(Main.class.getResourceAsStream("/" + path), out);
+			try {
+				out.close();
+			} catch(Throwable ignored) {
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return output;
+	}
+	
 	public static boolean LoadConfig() {
-		Main.getPlugin().saveDefaultConfig();
-		Main.configFile = new java.io.File(Main.dataFolderName, Main.configFileName);
-		Main.config = new org.bukkit.configuration.file.YamlConfiguration();
+		//plugin.saveDefaultConfig();
+		Main.config = new YamlConfiguration();
+		Main.configFile = new File(Main.dataFolderName, Main.configFileName);
+		if(!Main.configFile.exists()) {
+			YamlMgmtClass.getResourceFromStreamAsFile(Main.dataFolder, Main.configFileName);
+		}
 		//NEWCONFIGFile = new java.io.File(dataFolderName, NEWCONFIGFileName);
 		//NEWCONFIG = new YamlConfiguration();
 		try {
@@ -29,11 +69,11 @@ public class YamlMgmtClass {
 	private static void loadResourceFiles() throws Exception {
 		if(!Main.configFile.exists()) {
 			Main.configFile.getParentFile().mkdirs();
-			FileMgmt.copy(Main.getPlugin().getResource(Main.configFileName), Main.configFile);
+			YamlMgmtClass.getResourceFromStreamAsFile(Main.dataFolder, Main.configFileName);
 		}
 		/*if(!Main.NEWCONFIGFile.exists()) {
 			Main.NEWCONFIGFile.getParentFile().mkdirs();
-			FileMgmt.copy(plugin.getResource(Main.NEWCONFIGFileName), Main.NEWCONFIGFile);
+			YamlMgmtClass.getResourceFromStreamAsFile(Main.dataFolder, Main.NEWCONFIGFileName);
 		}*/
 	}
 	

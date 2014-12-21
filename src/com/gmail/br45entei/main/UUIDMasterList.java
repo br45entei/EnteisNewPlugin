@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.gmail.br45entei.main;
 
 import java.io.File;
@@ -9,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
@@ -27,8 +25,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitScheduler;
-//import java.io.IOException;
-//import org.bukkit.Location;
+
+import com.gmail.br45entei.main.yml.YamlMgmtClass;
 
 /** @author Brian_Entei */
 public class UUIDMasterList implements Listener {
@@ -84,9 +82,6 @@ public class UUIDMasterList implements Listener {
 	public File						uuidConfigFile		= null;
 	public String					uuidConfigFileName	= "UUID_MASTER_LIST.yml";
 	
-	//public String offlinePlayerFolderName = "Offline_Players";
-	//public File offlinePlayerFolder = null;
-	
 	public Main getPlugin() {
 		return this.plugin;
 	}
@@ -128,7 +123,8 @@ public class UUIDMasterList implements Listener {
 		return success;
 	}
 	
-	private boolean saveMasterListToConfig() {//sendConsoleMessage(pluginName + "&0_____&cpublic boolean &6saveMasterListToConfig&f() {");
+	private boolean saveMasterListToConfig() {
+		this.DEBUG("&0_____&cpublic boolean &6saveMasterListToConfig&f() {");
 		boolean success = true;
 		ConfigurationSection section = this.uuidConfig.getConfigurationSection("UUID_LIST");
 		if(section == null) {
@@ -145,7 +141,8 @@ public class UUIDMasterList implements Listener {
 		} catch(Exception e) {
 			e.printStackTrace();
 			success = false;
-		}//sendConsoleMessage(pluginName + "&0_____&f}");
+		}
+		this.DEBUG("&0_____&f}");
 		return success;
 	}
 	
@@ -206,23 +203,15 @@ public class UUIDMasterList implements Listener {
 	
 	public String getPlayerNameFromUUIDList(Player player) {
 		int playerIndexInList = this.getPlayerIndexInUUIDList(player);
-		//String[] playerEntry = null;
-		//if(playerIndexInList != -1) {
 		String[] playerEntry = this.uuidMasterList.get(playerIndexInList);
 		return playerEntry[1];
-		//}
-		//updatePlayerNameInUUIDList(player);
-		//return player.getName();
 	}
 	
 	public UUID getUUIDFromPlayerName(String playerName) {
-		//UUID uuid = null;
-		//int index = 0;
 		for(String[] curEntry : this.uuidMasterList) {
 			if(curEntry[1].equalsIgnoreCase(playerName)) {
 				return UUID.fromString(curEntry[0]);
 			}
-			//index++;
 		}
 		try {
 			List<String> names = new ArrayList<>();
@@ -277,7 +266,6 @@ public class UUIDMasterList implements Listener {
 	public ArrayList<String> getAllOfflinePlayerNamesFromList() {
 		ArrayList<String> rtrn = new ArrayList<>();
 		for(String[] curEntry : this.uuidMasterList) {
-			//String uuid = curEntry[0];
 			String playerName = curEntry[1];
 			if(Main.getPlayer(curEntry[1]) == null) {
 				rtrn.add(playerName);
@@ -289,7 +277,6 @@ public class UUIDMasterList implements Listener {
 	public ArrayList<String> getAllOnlinePlayerNamesFromList() {
 		ArrayList<String> rtrn = new ArrayList<>();
 		for(String[] curEntry : this.uuidMasterList) {
-			//String uuid = curEntry[0];
 			String playerName = curEntry[1];
 			if(Main.getPlayer(curEntry[1]) != null) {
 				rtrn.add(playerName);
@@ -308,7 +295,7 @@ public class UUIDMasterList implements Listener {
 		this.server.getPluginManager().registerEvents(this, this.plugin);
 		this.console = this.server.getConsoleSender();
 		this.scheduler = this.server.getScheduler();
-		this.dataFolder = this.plugin.getDataFolder();
+		this.dataFolder = new File(this.plugin.getDataFolder().getParentFile(), "UUIDMasterList");
 		if(!(this.dataFolder.exists())) {
 			this.dataFolder.mkdir();
 		}
@@ -329,12 +316,6 @@ public class UUIDMasterList implements Listener {
 		}
 		this.sendConsoleMessage(this.pluginName + "&eVersion " + this.pdffile.getVersion() + " is now enabled.");
 		this.enabled = true;
-		if(this.config.getBoolean("enableAutoUpdates")) {
-			/*Updater updater = new Updater(this, 77341, this.getFile(), UpdateType.NO_DOWNLOAD, true);
-			if(updater.getResult() == UpdateResult.UPDATE_AVAILABLE) {
-				this.getLogger().info("New version available! " + updater.getLatestName());
-			}*/
-		}
 	}
 	
 	public void onDisable() {
@@ -347,21 +328,19 @@ public class UUIDMasterList implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent evt) {
 		this.updatePlayerNameInUUIDList(evt.getPlayer());
 		this.saveMasterListToConfig();
-		//loadPlayerFromFile(evt.getPlayer());
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerQuit(PlayerQuitEvent evt) {
 		this.updatePlayerNameInUUIDList(evt.getPlayer());
 		this.saveMasterListToConfig();
-		//savePlayerToFile(evt.getPlayer());
 	}
 	
 	public boolean LoadConfig() {
 		this.plugin.saveDefaultConfig();
-		this.configFile = new java.io.File(this.dataFolderName, this.configFileName);
+		this.configFile = new File(this.dataFolder, this.configFileName);
 		this.config = new YamlConfiguration();
-		this.uuidConfigFile = new java.io.File(this.dataFolderName, this.uuidConfigFileName);
+		this.uuidConfigFile = new File(this.dataFolder, this.uuidConfigFileName);
 		this.uuidConfig = new YamlConfiguration();
 		try {
 			this.loadResourceFiles();
@@ -380,11 +359,11 @@ public class UUIDMasterList implements Listener {
 	private void loadResourceFiles() throws Exception {
 		if(!this.configFile.exists()) {
 			this.configFile.getParentFile().mkdirs();
-			FileMgmt.copy(this.plugin.getResource(this.configFileName), this.configFile);
+			this.configFile = YamlMgmtClass.getResourceFromStreamAsFile(this.dataFolder, this.configFileName);
 		}
 		if(!this.uuidConfigFile.exists()) {
 			this.uuidConfigFile.getParentFile().mkdirs();
-			FileMgmt.copy(this.plugin.getResource(this.uuidConfigFileName), this.uuidConfigFile);
+			this.uuidConfigFile = YamlMgmtClass.getResourceFromStreamAsFile(this.dataFolder, this.uuidConfigFileName);
 		}
 	}
 	
@@ -480,7 +459,7 @@ public class UUIDMasterList implements Listener {
 	public String sendConsoleMessage(String message) {
 		if(message == null || message.isEmpty()) return "";
 		message = this.formatColorCodes(message);
-		if(message.contains("&z") || message.contains("&Z")) {
+		if(StringUtils.containsIgnoreCase(message, "&z")) {
 			String[] msgs = message.split("(?i)&z");
 			for(String msg : msgs) {
 				this.console.sendMessage(msg.replaceAll("(?i)&z", "").trim());
@@ -492,26 +471,16 @@ public class UUIDMasterList implements Listener {
 	}
 	
 	public String sendMessage(Player target, String message) {
-		if(message == null || message.isEmpty() || target == null) return "";
-		message = this.formatColorCodes(message);
-		if(message.contains("&z")) {
-			String[] msgs = message.split("&z");
-			for(String msg : msgs) {
-				target.sendMessage(msg.replaceAll("&z", "").trim());
-			}
-			return message.trim();
-		}
-		target.sendMessage(message.trim());
-		return message.trim();
+		return this.sendMessage((CommandSender) target, message);
 	}
 	
 	public String sendMessage(CommandSender target, String message) {
 		if(message == null || message.isEmpty() || target == null) return "";
 		message = this.formatColorCodes(message);
-		if(message.contains("&z")) {
-			String[] msgs = message.split("&z");
+		if(StringUtils.containsIgnoreCase(message, "&z")) {
+			String[] msgs = message.split("(?i)&z");
 			for(String msg : msgs) {
-				target.sendMessage(msg.replaceAll("&z", "").trim());
+				target.sendMessage(msg.replaceAll("(?i)&z", "").trim());
 			}
 			return message;
 		}

@@ -20,18 +20,16 @@ public class EconomyAPI {
 		return successful;
 	}
 	
-	public static double getBalance(String playerName) {
-		return Main.econ.bankBalance(playerName).balance;
+	public static double getBalance(Player player) {
+		return Main.econ.getBalance(player);
 	}
 	
-	public static boolean deposit(String playerName, double amtToAdd) {
-		boolean success = Main.econ.bankDeposit(playerName, amtToAdd).transactionSuccess();
-		return success;
+	public static boolean deposit(Player player, double amtToAdd) {
+		return Main.econ.depositPlayer(player, amtToAdd).transactionSuccess();
 	}
 	
-	public static boolean withdraw(String playerName, double amtToSubtract) {
-		boolean success = Main.econ.bankWithdraw(playerName, amtToSubtract).transactionSuccess();
-		return success;
+	public static boolean withdraw(Player player, double amtToSubtract) {
+		return Main.econ.withdrawPlayer(player, amtToSubtract).transactionSuccess();
 	}
 	
 }

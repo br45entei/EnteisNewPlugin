@@ -17,6 +17,7 @@ import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,6 +34,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.br45entei.main.player.PlayerInformation;
+import com.gmail.br45entei.main.util.CodeUtils;
 import com.gmail.br45entei.main.yml.YamlMgmtClass;
 
 /** @author Brian_Entei */
@@ -142,6 +145,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static PluginDescriptionFile	pdffile;
 	public static ConsoleCommandSender	console;
 	public static Server				server			= null;
+	public static File					dataFolder		= null;
 	public static String				dataFolderName	= "";
 	public static boolean				YamlsAreLoaded	= false;
 	public static FileConfiguration		config;
@@ -247,10 +251,11 @@ public class Main extends JavaPlugin implements Listener {
 		Main.showDebugMsg(Main.pluginName + "The dataFolderName variable is: \"" + Main.dataFolderName + "\"!", Main.showDebugMsgs);
 		// TODO Loading Files, plugins, etc.
 		YamlMgmtClass.LoadConfig();
+		Main.uuidMasterList.onEnable();
 		if(Main.setupEconomy()) {
 			Main.sendConsoleMessage(Main.pluginName + "&2Vault Economy API Successful!");
 		} else {
-			Main.sendConsoleMessage(Main.pluginName + "&eUnable to utilize Vault Economy API. Shop features may not work as intended.");
+			Main.sendConsoleMessage(Main.pluginName + "&cUnable to utilize Vault Economy API. Shop features may not work as intended.");
 		}
 		if(Main.setupPermissions()) {
 			Main.sendConsoleMessage(Main.pluginName + "&2Vault Permission API Successful!");
@@ -263,9 +268,26 @@ public class Main extends JavaPlugin implements Listener {
 		// TODO End of Loading Files, plugins, etc.
 		if(Main.enabled) {
 			Main.server.getPluginManager().registerEvents(this, this);
-			Main.uuidMasterList.onEnable();
 			Main.sendConsoleMessage(Main.pluginName + "&aVersion " + Main.pdffile.getVersion() + " is now enabled!");
+			//Back up the config files:
+			File playerFolder = PlayerInformation.getSaveFolder();
+			try {
+				String date = CodeUtils.getSystemTime(false, true, true);//Date only, file system safe
+				File backupsFolder = new File(Main.dataFolder, FilenameUtils.getName(playerFolder.getAbsolutePath()) + "_Backups");
+				backupsFolder.mkdirs();
+				File playerZip = new File(backupsFolder, FilenameUtils.getName(playerFolder.getAbsolutePath()) + "_" + date + ".zip");
+				try {
+					playerZip.delete();
+				} catch(Throwable ignored) {
+				}
+				FileMgmt.zipDir(playerFolder, playerZip);
+				YamlMgmtClass.getResourceFromStreamAsFile(Main.dataFolder, "permissions.txt");
+			} catch(Throwable e) {
+				Main.sendConsoleMessage(Main.pluginName + "&cUnable to automatically back up configuration files:");
+				e.printStackTrace();
+			}
 		} else {
+			Main.uuidMasterList.onDisable();
 			this.onDisable();
 		}
 	}
@@ -1024,7 +1046,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			Main.sendMessage(sender, Main.pluginName + "&eUsage: \"/" + command + " info\" or use an admin command.");
 			return true;
-		} else if(command.equalsIgnoreCase("loadplugin")) {
+		} else if(command.equalsIgnoreCase("newcommandhere")) {
 			
 			return true;
 		} else {

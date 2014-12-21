@@ -168,7 +168,7 @@ public class FileMgmt {
 		return getFile;
 	}*/
 	
-	private static void copy(InputStream in, OutputStream out) throws IOException {
+	public static void copy(InputStream in, OutputStream out) throws IOException {
 		byte[] buffer = new byte[1024];
 		while(true) {
 			int readCount = in.read(buffer);

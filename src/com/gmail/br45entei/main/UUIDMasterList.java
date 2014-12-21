@@ -421,7 +421,7 @@ public class UUIDMasterList implements Listener {
 			if(this.configVersion.equals(this.pdffile.getVersion())) {
 				this.DEBUG(this.pluginName + "&aThe " + this.configFileName + "'s version matches this plugin's version(&f" + this.pdffile.getVersion() + "&a)!");
 			} else {
-				this.sendConsoleMessage(this.pluginName + "&eThe " + this.configFileName + "'s version does NOT match this plugin's version(&f" + this.pdffile.getVersion() + "&e)! Make sure that you update the " + this.configFileName + " from this plugin's latest version! You can find this at &ahttp://dev.bukkit.org/plugins/enteis-plugin-library/&e.");
+				this.sendConsoleMessage(this.pluginName + "&eThe " + this.configFileName + "'s version does NOT match this plugin's version(&f" + this.pdffile.getVersion() + "&e)! Make sure that you update the " + this.configFileName + " from this plugin's latest version!");
 			}
 		} catch(Exception e) {
 			this.sendConsoleMessage(this.pluginName + "&eThe version in the config.yml was not set!");

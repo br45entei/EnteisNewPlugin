@@ -17,4 +17,5 @@ commands:
     aliases: [enteisnewplugin]
   uuid:
     description: "Checks player uuids and other useful functions."
+    usage: "/uuid [playerName|printmasterlist|pml|saveall]"
     aliases: [uuids]

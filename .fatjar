@@ -1,10 +1,10 @@
 #Fat Jar Configuration File
-#Sat Dec 20 13:05:33 CST 2014
+#Sat Dec 20 23:41:22 CST 2014
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=false
 onejar.checkbox=false
-jarname=C\:\\Java\\Minecraft\\HuntersMcServ\\plugins\\NewPlugin.jar
+jarname=C\:\\Java\\Minecraft\\HuntersMcServ\\plugins\\Entei's New Plugin.jar
 manifest.mergeall=true
 manifest.mainclass=
 manifest.file=<createnew>
